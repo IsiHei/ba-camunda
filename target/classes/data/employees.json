@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "John Miller",
+    "weekly hours": 20
+  },
+  {
+    "id": 2,
+    "name": "Daisy Doe",
+    "weekly hours": 38
+  },
+  {
+    "id": 3,
+    "name": "James Smith",
+    "weekly hours": 40
+  },
+  {
+    "id": 4,
+    "name": "William Crane",
+    "weekly hours": 30
+  }
+]

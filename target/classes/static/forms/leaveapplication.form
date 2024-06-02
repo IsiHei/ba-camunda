@@ -1,0 +1,86 @@
+{
+  "components": [
+    {
+      "values": [
+        {
+          "label": "John Miller",
+          "value": "jason_miller"
+        },
+        {
+          "label": "Daisy Doe",
+          "value": "daisy_doe"
+        },
+        {
+          "label": "James Smith",
+          "value": "james_smith"
+        },
+        {
+          "label": "William Crane",
+          "value": "william_crane"
+        }
+      ],
+      "label": "Name",
+      "type": "select",
+      "layout": {
+        "row": "Row_16vae4f",
+        "columns": null
+      },
+      "id": "Field_1k7s747",
+      "key": "employee"
+    },
+    {
+      "subtype": "date",
+      "dateLabel": "Start date",
+      "label": "Date time",
+      "type": "datetime",
+      "layout": {
+        "row": "Row_1qdpwij",
+        "columns": null
+      },
+      "id": "Field_026315a",
+      "key": "start_date"
+    },
+    {
+      "subtype": "date",
+      "dateLabel": "End date",
+      "label": "Date time",
+      "type": "datetime",
+      "layout": {
+        "row": "Row_1qdpwij",
+        "columns": null
+      },
+      "id": "Field_1quevy3",
+      "key": "end_date"
+    },
+    {
+      "values": [
+        {
+          "label": "Department Manager",
+          "value": "dm_reviewer"
+        },
+        {
+          "label": "Group Leader",
+          "value": "gl_reviewer"
+        }
+      ],
+      "label": "Select",
+      "type": "select",
+      "layout": {
+        "row": "Row_1sehoeg",
+        "columns": null
+      },
+      "id": "Field_1h6mns2",
+      "key": "reviewer",
+      "defaultValue": "gl_reviewer"
+    }
+  ],
+  "type": "default",
+  "id": "leave_application_form",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.23.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.21.0",
+  "schemaVersion": 16
+}

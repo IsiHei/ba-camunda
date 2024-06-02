@@ -1,0 +1,35 @@
+{
+  "components": [
+    {
+      "values": [
+        {
+          "label": "is available",
+          "value": "yes"
+        },
+        {
+          "label": "is NOT available",
+          "value": "no"
+        }
+      ],
+      "label": "Is the requested Item available?",
+      "type": "radio",
+      "layout": {
+        "row": "Row_0938e2a",
+        "columns": null
+      },
+      "id": "Field_1l7r9ix",
+      "key": "available",
+      "description": "availability",
+      "defaultValue": "no"
+    }
+  ],
+  "type": "default",
+  "id": "orderavailability",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.11.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.19.0",
+  "schemaVersion": 8
+}

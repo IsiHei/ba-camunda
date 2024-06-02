@@ -1,0 +1,35 @@
+{
+  "components": [
+    {
+      "values": [
+        {
+          "label": "quality is aprooved",
+          "value": "yes"
+        },
+        {
+          "label": "bad quality",
+          "value": "no"
+        }
+      ],
+      "label": "Does the product quality meats the company standards?",
+      "type": "radio",
+      "layout": {
+        "row": "Row_1axl8ch",
+        "columns": null
+      },
+      "id": "Field_02d3hxe",
+      "key": "good_quality",
+      "defaultValue": "<none>",
+      "disabled": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_0u2etm0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.11.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.19.0",
+  "schemaVersion": 8
+}

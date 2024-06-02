@@ -1,0 +1,33 @@
+{
+  "components": [
+    {
+      "values": [
+        {
+          "label": "are available",
+          "value": "yes"
+        },
+        {
+          "label": "are NOT available",
+          "value": "no"
+        }
+      ],
+      "label": "Are the needed Materials for producton available?",
+      "type": "radio",
+      "layout": {
+        "row": "Row_0armjp2",
+        "columns": null
+      },
+      "id": "Field_0r4h0h8",
+      "key": "materials_available"
+    }
+  ],
+  "type": "default",
+  "id": "Form_14dyo9l",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.11.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.19.0",
+  "schemaVersion": 8
+}

@@ -1,0 +1,33 @@
+{
+  "components": [
+    {
+      "values": [
+        {
+          "label": "leave is approved",
+          "value": "yes"
+        },
+        {
+          "label": "leave is NOT approved",
+          "value": "no"
+        }
+      ],
+      "label": "Is the eave approved?",
+      "type": "radio",
+      "layout": {
+        "row": "Row_0rrkpbl",
+        "columns": null
+      },
+      "id": "Field_1tdlyye",
+      "key": "approve_leave"
+    }
+  ],
+  "type": "default",
+  "id": "Form_1uukm54",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.11.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.19.0",
+  "schemaVersion": 8
+}

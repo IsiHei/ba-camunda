@@ -1,0 +1,33 @@
+{
+  "components": [
+    {
+      "values": [
+        {
+          "label": "offer job",
+          "value": "yes"
+        },
+        {
+          "label": "NOT offer job",
+          "value": "no"
+        }
+      ],
+      "label": "Offer job?",
+      "type": "radio",
+      "layout": {
+        "row": "Row_1j07pac",
+        "columns": null
+      },
+      "id": "Field_08ur1u5",
+      "key": "job_offer"
+    }
+  ],
+  "type": "default",
+  "id": "Form_09ttl6w",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.23.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.21.0",
+  "schemaVersion": 16
+}

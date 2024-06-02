@@ -1,0 +1,42 @@
+{
+  "components": [
+    {
+      "label": "buy ingredients",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0ezxndb",
+        "columns": null
+      },
+      "id": "Field_1ghwgql",
+      "key": "costs",
+      "description": "How much does it cost?",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "choose oven",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0bihbut",
+        "columns": null
+      },
+      "id": "Field_0bqrsca",
+      "key": "oven",
+      "description": "Where to bake?",
+      "validate": {
+        "required": true,
+        "pattern": "electro|gas"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "preparebaking",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.2.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.11.0"
+  },
+  "schemaVersion": 8
+}
