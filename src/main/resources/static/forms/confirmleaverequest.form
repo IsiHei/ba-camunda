@@ -3,26 +3,26 @@
     {
       "values": [
         {
-          "label": "are available",
+          "label": "confim leave application",
           "value": "yes"
         },
         {
-          "label": "are NOT available",
+          "label": "reject leave application",
           "value": "no"
         }
       ],
-      "label": "Are the needed Materials for producton available?",
+      "label": "Confirmation",
       "type": "radio",
       "layout": {
-        "row": "Row_0armjp2",
+        "row": "Row_07gr760",
         "columns": null
       },
-      "id": "Field_0r4h0h8",
-      "key": "materials_available"
+      "id": "Field_1v0ok3u",
+      "key": "confirmed"
     }
   ],
   "type": "default",
-  "id": "Form_14dyo9l",
+  "id": "confirm_leave_appication_form",
   "exporter": {
     "name": "Camunda Modeler",
     "version": "5.23.0"

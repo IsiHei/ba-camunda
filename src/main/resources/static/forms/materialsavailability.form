@@ -25,9 +25,9 @@
   "id": "Form_14dyo9l",
   "exporter": {
     "name": "Camunda Modeler",
-    "version": "5.11.0"
+    "version": "5.23.0"
   },
   "executionPlatform": "Camunda Platform",
-  "executionPlatformVersion": "7.19.0",
-  "schemaVersion": 8
+  "executionPlatformVersion": "7.21.0",
+  "schemaVersion": 16
 }

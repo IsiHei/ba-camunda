@@ -29,30 +29,6 @@
       "key": "employee"
     },
     {
-      "subtype": "date",
-      "dateLabel": "Start date",
-      "label": "Date time",
-      "type": "datetime",
-      "layout": {
-        "row": "Row_1qdpwij",
-        "columns": null
-      },
-      "id": "Field_026315a",
-      "key": "start_date"
-    },
-    {
-      "subtype": "date",
-      "dateLabel": "End date",
-      "label": "Date time",
-      "type": "datetime",
-      "layout": {
-        "row": "Row_1qdpwij",
-        "columns": null
-      },
-      "id": "Field_1quevy3",
-      "key": "end_date"
-    },
-    {
       "values": [
         {
           "label": "Department Manager",
@@ -63,7 +39,7 @@
           "value": "gl_reviewer"
         }
       ],
-      "label": "Select",
+      "label": "Who should review your application?",
       "type": "select",
       "layout": {
         "row": "Row_1sehoeg",
@@ -71,7 +47,146 @@
       },
       "id": "Field_1h6mns2",
       "key": "reviewer",
-      "defaultValue": "gl_reviewer"
+      "defaultValue": "gl_reviewer",
+      "readonly": false,
+      "searchable": false,
+      "disabled": false,
+      "validate": {
+        "required": false
+      }
+    },
+    {
+      "components": [
+        {
+          "components": [
+            {
+              "label": "Day",
+              "type": "number",
+              "layout": {
+                "row": "Row_0e4jj2r",
+                "columns": null
+              },
+              "id": "Field_0ksj4zo",
+              "key": "start_day",
+              "decimalDigits": 0,
+              "validate": {
+                "required": false,
+                "min": 1,
+                "max": 31
+              },
+              "defaultValue": 1
+            },
+            {
+              "label": "Month",
+              "type": "number",
+              "layout": {
+                "row": "Row_0e4jj2r",
+                "columns": null
+              },
+              "id": "Field_0q70hvs",
+              "key": "start_month",
+              "decimalDigits": 0,
+              "validate": {
+                "min": 1,
+                "max": 12
+              },
+              "defaultValue": 1
+            },
+            {
+              "label": "Year",
+              "type": "number",
+              "layout": {
+                "row": "Row_0e4jj2r",
+                "columns": null
+              },
+              "id": "Field_1891xen",
+              "key": "start_year",
+              "defaultValue": 2024,
+              "decimalDigits": 0,
+              "validate": {
+                "min": 2024,
+                "max": 2025
+              }
+            }
+          ],
+          "showOutline": true,
+          "label": "Start",
+          "type": "group",
+          "layout": {
+            "row": "Row_1n6swt6",
+            "columns": null
+          },
+          "id": "Field_00jhr8a"
+        },
+        {
+          "components": [
+            {
+              "label": "Day",
+              "type": "number",
+              "layout": {
+                "row": "Row_1x8uw77",
+                "columns": null
+              },
+              "id": "Field_1plpwxj",
+              "key": "end_day",
+              "decimalDigits": 0,
+              "validate": {
+                "min": 1,
+                "max": 31
+              },
+              "defaultValue": 1
+            },
+            {
+              "label": "Month",
+              "type": "number",
+              "layout": {
+                "row": "Row_1x8uw77",
+                "columns": null
+              },
+              "id": "Field_0h0gedl",
+              "key": "end_month",
+              "decimalDigits": 0,
+              "validate": {
+                "min": 1,
+                "max": 12
+              },
+              "defaultValue": 1
+            },
+            {
+              "label": "Year",
+              "type": "number",
+              "layout": {
+                "row": "Row_1x8uw77",
+                "columns": null
+              },
+              "id": "Field_103iqfo",
+              "key": "end_year",
+              "defaultValue": 2024,
+              "decimalDigits": 0,
+              "validate": {
+                "min": 2024,
+                "max": 2025
+              }
+            }
+          ],
+          "showOutline": true,
+          "label": "End",
+          "type": "group",
+          "layout": {
+            "row": "Row_1n6swt6",
+            "columns": null
+          },
+          "id": "Field_0vr8s2a"
+        }
+      ],
+      "showOutline": true,
+      "label": "Date",
+      "type": "group",
+      "layout": {
+        "row": "Row_0eisxg0",
+        "columns": null
+      },
+      "id": "Field_0ggfseq"
     }
   ],
   "type": "default",

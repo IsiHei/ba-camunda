@@ -7,7 +7,9 @@ export default {
     render: async (node, {api, processInstanceId}) => {
         const activity = await getCurrentActivity(api, processInstanceId)
         const activityId = await activity.id
-        // Erstellen Sie den HTML-Inhalt ohne das Chart.js-Skript im Inneren
+
+        // Process: Vacation Request
+        // Activity: Check request by Department Manager
         if (activityId === "check_dm") {
             const projects = await getProjects().valueOf();
             const project_names = []
@@ -17,16 +19,21 @@ export default {
                 project_names.push(project.Name);
                 project_hours.push(project.Hours)
             }
-            console.log(project_names)
-            console.log(project_hours);
+            const employees = await getEmployees().valueOf();
+            const employee_names = [];
+            const employee_hours = [];
+            for (const e in employees) {
+                const employee = employees[e];
+                employee_names.push(employee.Name);
+                employee_hours.push(employee.Weekly_hours)
+            }
+            console.log(employee_names)
+            console.log(employee_hours)
             node.innerHTML = `
-                <div>
-                    <span style="text-decoration: underline;">Context information:</span>
-                </div>
                 <div style="width: 100%; height: 100%; padding-block: 20px; margin: auto; text-align: center;">
-                    <div style="float:left; width:19%; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px;">
+                    <div style="float:left; width:auto; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
                         <div style="padding-block: 5px;">
-                            <span style="width: 100%; font-weight: bold;">
+                            <span style="width: 100%; font-size: x-large; margin: 20px;">
                                 Needed hours for ongoing projects
                             </span>
                         </div>
@@ -34,16 +41,23 @@ export default {
                             <canvas id="projectsDoughnut" width="10" height="10"></canvas>
                         </div>
                     </div>
-                    <div style="float:right; width: 79%; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px;">
-                        <canvas id="myChart" width="50" height="20"></canvas>
+                    <div style="float:left; width: 600px; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
+                        <div style="padding-block: 5px;">
+                            <span style="width: 100%; font-size: x-large; margin: 20px">
+                                Weekly hours per employee
+                            </span>
+                        </div>
+                        <div style="padding-block: 5px;">   
+                            <canvas id="weeklyHoursChart" width="50" height="20"></canvas>
+                        </div>
                     </div>
                 </div>
             `;
             const script = document.createElement('script');
             script.src = "https://cdn.jsdelivr.net/npm/chart.js";
             script.onload = () => {
-                const ctx = document.getElementById('projectsDoughnut').getContext('2d');
-                const myDougnut = new Chart(ctx, {
+                const pd = document.getElementById('projectsDoughnut').getContext('2d');
+                const projectsDoughnut = new Chart(pd, {
                     type: 'doughnut',
                     data: {
                         labels: project_names, //['Project 1', 'Project 2', 'Project 3', 'Project 4', 'Project 5', 'Unused hours']
@@ -51,14 +65,30 @@ export default {
                             label: 'needed hours',
                             data: project_hours, //[120, 190, 300, 150, 90, 350]
                             backgroundColor: [
-                                'rgb(0,255,37)',
-                                'rgb(134,75,88)',
-                                'rgb(75,134,127)',
-                                'rgb(75,107,134)',
-                                'rgb(99,75,134)',
-                                'rgb(134,75,124)',
+                                'rgba(35,128,48, 0.8)',
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(255,131,64,0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(201, 203, 207, 0.2)'
                             ],
-                            borderWidth: 1
+                            borderColor: [
+                                'rgb(35,128,48)',
+                                'rgb(255, 99, 132)',
+                                'rgb(255, 131, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(54, 162, 235)',
+                                'rgb(153, 102, 255)',
+                                'rgb(201, 203, 207)'
+                            ],
+                            borderWidth: 1,
+                            radius: '80%',
+                            spacing: 7,
+                            cutout: '70%',
+                            rotation: 50
                         }]
                     },
                     options: {
@@ -69,21 +99,37 @@ export default {
                             },
                             title: {
                                 display: false,
-                                text: 'Auslastung'
+                                text: 'workload'
                             }
                         }
                     }
                 });
-                const ctx2 = document.getElementById('myChart').getContext('2d');
-                const myChart = new Chart(ctx2, {
-                    type: 'line',
+                // weekly hours for every employee
+                const whc = document.getElementById('weeklyHoursChart').getContext('2d');
+                const whChart = new Chart(whc, {
+                    type: 'bar',
                     data: {
-                        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                        labels: employee_names,
                         datasets: [{
-                            label: '# of Votes',
-                            data: [12, 19, 3, 5, 2, 3],
+                            label: 'weekly hours',
+                            data: employee_hours,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(255, 159, 64, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(201, 203, 207, 0.2)'
+                            ],
                             borderColor: [
-                                'rgb(134,75,88)',
+                                'rgb(255, 99, 132)',
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(54, 162, 235)',
+                                'rgb(153, 102, 255)',
+                                'rgb(201, 203, 207)'
                             ],
                             borderWidth: 1
                         }]
@@ -102,6 +148,63 @@ export default {
             };
             document.head.appendChild(script);
         }
+        // Process: Vacation Request
+        // Activity: Check request by Group Leader
+        else if (activityId === "check_gl") {
+            node.innerHTML = `
+                <div>
+                    context for group leader comes here soon ...
+                    <canvas id="pastRequestChart"></canvas>
+                </div>
+            `
+            const script = document.createElement('script');
+            script.src = "https://cdn.jsdelivr.net/npm/chart.js";
+            script.onload = () => {
+                const pd = document.getElementById('pastRequestsChart').getContext('2d');
+                const projectsDoughnut = new Chart(pd, {
+                    type: 'bar',
+                    data: {
+                        labels: employee_names,
+                        datasets: [{
+                            label: 'accepted applications',
+                            data: employee_applications_accepted,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(255, 159, 64, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(201, 203, 207, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(54, 162, 235)',
+                                'rgb(153, 102, 255)',
+                                'rgb(201, 203, 207)'
+                            ],
+                            borderWidth: 1
+                        },{
+                            label: 'rejected applications',
+                            data: employee_applications_rejected
+
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stacked: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        //without special context
         else {
             node.innerHTML = `
                   <div>
@@ -126,7 +229,6 @@ export default {
                   </div>
             `;
 
-            // Chart.js-Skript laden und sicherstellen, dass es vor der Verwendung geladen ist
             const script = document.createElement('script');
             script.src = "https://cdn.jsdelivr.net/npm/chart.js";
             script.onload = () => {
@@ -227,6 +329,27 @@ async function getProjects() {
 async function getEmployees() {
     const response = await fetch("http://localhost:8080/employees");
     return await response.json();
+}
+
+async function getCompletedProcesses() {
+    const response = await fetch("http://localhost:8080/completed-processes");
+    return await response.json();
+}
+
+async function getApplicationStatistic() {
+    // employee_name, #rejected_applications, #accepted_applications
+    const completed_processes = getCompletedProcesses();
+    for (const p in completed_processes) {
+        const process = completed_processes[p];
+        if (process.processDefinitionKey === 'leave_request') {
+            if (process.endActivityId === 'application_accepted') {
+
+            }
+            else if (process.endActivityId === 'application_rejected') {
+
+            }
+        }
+    }
 }
 
 async function getCurrentActivity(api, processInstanceId) {

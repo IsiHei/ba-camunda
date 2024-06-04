@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_09fu7w9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.23.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
   <bpmn:collaboration id="collab_vacation_request">
-    <bpmn:participant id="company" name="Company" processRef="vacation_request" />
+    <bpmn:participant id="company" name="Company" processRef="leave_request" />
   </bpmn:collaboration>
-  <bpmn:process id="vacation_request" name="Vacation Request" isExecutable="true" camunda:historyTimeToLive="365">
+  <bpmn:process id="leave_request" name="Leave Request" isExecutable="true" camunda:historyTimeToLive="365">
     <bpmn:laneSet id="LaneSet_0e915dn">
       <bpmn:lane id="company_department" name="Department">
-        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_0i84dsc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>leave_needed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>reviewer_gateway</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_1qe8363</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>check_dm</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>check_gl</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>send_leave_application</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_1b2n12r</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_0z2uiqg</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1hp80v1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1b2n12r</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0v3021w</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>application_rejected</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="company_hr_office" name="HR Office">
         <bpmn:flowNodeRef>Activity_16i35y8</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_14xbpoh</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>application_approved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0qtextf</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
-    <bpmn:startEvent id="StartEvent_1" name="">
+    <bpmn:startEvent id="leave_needed" name="Leave needed">
       <bpmn:outgoing>Flow_13hqy5z</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:exclusiveGateway id="Gateway_0i84dsc" name="reviewer?">
+    <bpmn:exclusiveGateway id="reviewer_gateway" name="reviewer?">
       <bpmn:incoming>Flow_08lodwh</bpmn:incoming>
       <bpmn:outgoing>Flow_0ut9459</bpmn:outgoing>
       <bpmn:outgoing>Flow_0ul4h6f</bpmn:outgoing>
@@ -38,7 +40,7 @@
       <bpmn:incoming>Flow_0ut9459</bpmn:incoming>
       <bpmn:outgoing>Flow_1os9dlz</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:userTask id="check_gl" name="Check request by Group Leader">
+    <bpmn:userTask id="check_gl" name="Check request by Group Leader" camunda:formKey="camunda-forms:/forms/checkleaverequest.form">
       <bpmn:incoming>Flow_0ul4h6f</bpmn:incoming>
       <bpmn:outgoing>Flow_0zrexqf</bpmn:outgoing>
     </bpmn:userTask>
@@ -46,27 +48,19 @@
       <bpmn:incoming>Flow_13hqy5z</bpmn:incoming>
       <bpmn:outgoing>Flow_08lodwh</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_13hqy5z" sourceRef="StartEvent_1" targetRef="send_leave_application" />
-    <bpmn:sequenceFlow id="Flow_08lodwh" sourceRef="send_leave_application" targetRef="Gateway_0i84dsc" />
-    <bpmn:sequenceFlow id="Flow_0ut9459" name="dm" sourceRef="Gateway_0i84dsc" targetRef="check_dm">
+    <bpmn:sequenceFlow id="Flow_13hqy5z" sourceRef="leave_needed" targetRef="send_leave_application" />
+    <bpmn:sequenceFlow id="Flow_08lodwh" sourceRef="send_leave_application" targetRef="reviewer_gateway" />
+    <bpmn:sequenceFlow id="Flow_0ut9459" name="dm" sourceRef="reviewer_gateway" targetRef="check_dm">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{reviewer=='dm_reviewer'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0ul4h6f" name="gl" sourceRef="Gateway_0i84dsc" targetRef="check_gl">
+    <bpmn:sequenceFlow id="Flow_0ul4h6f" name="gl" sourceRef="reviewer_gateway" targetRef="check_gl">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{reviewer=='gl_reviewer'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1os9dlz" sourceRef="check_dm" targetRef="Gateway_1qe8363" />
     <bpmn:sequenceFlow id="Flow_0zrexqf" sourceRef="check_gl" targetRef="Gateway_1qe8363" />
     <bpmn:sequenceFlow id="Flow_18q222q" sourceRef="Activity_1b2n12r" targetRef="Activity_16i35y8" />
-    <bpmn:sequenceFlow id="Flow_1x1yroc" sourceRef="Activity_16i35y8" targetRef="Event_14xbpoh" />
+    <bpmn:sequenceFlow id="Flow_1x1yroc" sourceRef="Activity_16i35y8" targetRef="Gateway_0qtextf" />
     <bpmn:sequenceFlow id="Flow_0qur6io" sourceRef="Gateway_1qe8363" targetRef="Gateway_0z2uiqg" />
-    <bpmn:task id="Activity_1b2n12r" name="Send to HR">
-      <bpmn:incoming>Flow_0o22dfg</bpmn:incoming>
-      <bpmn:outgoing>Flow_18q222q</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:userTask id="Activity_16i35y8" name="Confirm Leave Application">
-      <bpmn:incoming>Flow_18q222q</bpmn:incoming>
-      <bpmn:outgoing>Flow_1x1yroc</bpmn:outgoing>
-    </bpmn:userTask>
     <bpmn:exclusiveGateway id="Gateway_0z2uiqg" name="Leave approved?">
       <bpmn:incoming>Flow_0qur6io</bpmn:incoming>
       <bpmn:outgoing>Flow_0o22dfg</bpmn:outgoing>
@@ -75,14 +69,39 @@
     <bpmn:sequenceFlow id="Flow_0o22dfg" name="Yes" sourceRef="Gateway_0z2uiqg" targetRef="Activity_1b2n12r">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{approve_leave=='yes'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1k0dbow" name="No" sourceRef="Gateway_0z2uiqg" targetRef="Event_1hp80v1">
+    <bpmn:sequenceFlow id="Flow_1k0dbow" name="No" sourceRef="Gateway_0z2uiqg" targetRef="Gateway_0v3021w">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{approve_leave=='no'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:endEvent id="Event_14xbpoh" name="approve">
-      <bpmn:incoming>Flow_1x1yroc</bpmn:incoming>
+    <bpmn:task id="Activity_1b2n12r" name="Send to HR">
+      <bpmn:incoming>Flow_0o22dfg</bpmn:incoming>
+      <bpmn:outgoing>Flow_18q222q</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:userTask id="Activity_16i35y8" name="Confirm Leave Application" camunda:formKey="camunda-forms:/forms/confirmleaverequest.form">
+      <bpmn:incoming>Flow_18q222q</bpmn:incoming>
+      <bpmn:outgoing>Flow_1x1yroc</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="application_approved" name="approve">
+      <bpmn:incoming>Flow_1diyrwl</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:endEvent id="Event_1hp80v1" name="reject">
+    <bpmn:exclusiveGateway id="Gateway_0qtextf" name="Application confirmed?">
+      <bpmn:incoming>Flow_1x1yroc</bpmn:incoming>
+      <bpmn:outgoing>Flow_1diyrwl</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0nr4adf</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1diyrwl" name="Yes" sourceRef="Gateway_0qtextf" targetRef="application_approved">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{confirmed=='yes'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1at5l4f" sourceRef="Gateway_0v3021w" targetRef="application_rejected" />
+    <bpmn:exclusiveGateway id="Gateway_0v3021w">
       <bpmn:incoming>Flow_1k0dbow</bpmn:incoming>
+      <bpmn:incoming>Flow_0nr4adf</bpmn:incoming>
+      <bpmn:outgoing>Flow_1at5l4f</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0nr4adf" name="No" sourceRef="Gateway_0qtextf" targetRef="Gateway_0v3021w">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{confirmed=='no'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="application_rejected" name="reject">
+      <bpmn:incoming>Flow_1at5l4f</bpmn:incoming>
     </bpmn:endEvent>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -99,13 +118,13 @@
         <dc:Bounds x="190" y="80" width="1198" height="340" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="leave_needed">
         <dc:Bounds x="262" y="202" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="31" y="245" width="59" height="27" />
+          <dc:Bounds x="246" y="245" width="70" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0i84dsc_di" bpmnElement="Gateway_0i84dsc" isMarkerVisible="true">
+      <bpmndi:BPMNShape id="Gateway_0i84dsc_di" bpmnElement="reviewer_gateway" isMarkerVisible="true">
         <dc:Bounds x="505" y="195" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="566" y="210" width="48" height="14" />
@@ -125,29 +144,38 @@
       <bpmndi:BPMNShape id="Activity_1m09ynw_di" bpmnElement="send_leave_application">
         <dc:Bounds x="350" y="180" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1w43g7e_di" bpmnElement="Activity_1b2n12r">
-        <dc:Bounds x="1080" y="180" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0oxnrxk_di" bpmnElement="Activity_16i35y8">
-        <dc:Bounds x="1080" y="450" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0z2uiqg_di" bpmnElement="Gateway_0z2uiqg" isMarkerVisible="true">
         <dc:Bounds x="905" y="195" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="887" y="165" width="86" height="14" />
+          <dc:Bounds x="887" y="171" width="86" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_14xbpoh_di" bpmnElement="Event_14xbpoh">
-        <dc:Bounds x="1292" y="472" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_1w43g7e_di" bpmnElement="Activity_1b2n12r">
+        <dc:Bounds x="880" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0oxnrxk_di" bpmnElement="Activity_16i35y8">
+        <dc:Bounds x="880" y="460" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_14xbpoh_di" bpmnElement="application_approved">
+        <dc:Bounds x="1292" y="482" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1290" y="515" width="40" height="14" />
+          <dc:Bounds x="1290" y="525" width="40" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1hp80v1_di" bpmnElement="Event_1hp80v1">
-        <dc:Bounds x="912" y="312" width="36" height="36" />
+      <bpmndi:BPMNShape id="Gateway_0qtextf_di" bpmnElement="Gateway_0qtextf" isMarkerVisible="true">
+        <dc:Bounds x="1105" y="475" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="917" y="355" width="27" height="14" />
+          <dc:Bounds x="1103" y="532" width="55" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0v3021w_di" bpmnElement="Gateway_0v3021w" isMarkerVisible="true">
+        <dc:Bounds x="1105" y="195" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1hp80v1_di" bpmnElement="application_rejected">
+        <dc:Bounds x="1292" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1297" y="245" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_13hqy5z_di" bpmnElement="Flow_13hqy5z">
@@ -185,29 +213,47 @@
         <di:waypoint x="780" y="245" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_18q222q_di" bpmnElement="Flow_18q222q">
-        <di:waypoint x="1130" y="260" />
-        <di:waypoint x="1130" y="450" />
+        <di:waypoint x="930" y="390" />
+        <di:waypoint x="930" y="460" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1x1yroc_di" bpmnElement="Flow_1x1yroc">
-        <di:waypoint x="1180" y="490" />
-        <di:waypoint x="1292" y="490" />
+        <di:waypoint x="980" y="500" />
+        <di:waypoint x="1105" y="500" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0qur6io_di" bpmnElement="Flow_0qur6io">
         <di:waypoint x="805" y="220" />
         <di:waypoint x="905" y="220" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0o22dfg_di" bpmnElement="Flow_0o22dfg">
-        <di:waypoint x="955" y="220" />
-        <di:waypoint x="1080" y="220" />
+        <di:waypoint x="930" y="245" />
+        <di:waypoint x="930" y="310" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1009" y="202" width="18" height="14" />
+          <dc:Bounds x="932" y="271" width="18" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1k0dbow_di" bpmnElement="Flow_1k0dbow">
-        <di:waypoint x="930" y="245" />
-        <di:waypoint x="930" y="312" />
+        <di:waypoint x="955" y="220" />
+        <di:waypoint x="1105" y="220" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="938" y="276" width="15" height="14" />
+          <dc:Bounds x="1075" y="197" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1diyrwl_di" bpmnElement="Flow_1diyrwl">
+        <di:waypoint x="1155" y="500" />
+        <di:waypoint x="1292" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1215" y="482" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1at5l4f_di" bpmnElement="Flow_1at5l4f">
+        <di:waypoint x="1155" y="220" />
+        <di:waypoint x="1292" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nr4adf_di" bpmnElement="Flow_0nr4adf">
+        <di:waypoint x="1130" y="475" />
+        <di:waypoint x="1130" y="245" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1138" y="357" width="15" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

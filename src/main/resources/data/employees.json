@@ -1,22 +1,22 @@
 [
   {
-    "id": 1,
-    "name": "John Miller",
-    "weekly hours": 20
+    "Id": 1,
+    "Name": "John Miller",
+    "Weekly_hours": 20
   },
   {
-    "id": 2,
-    "name": "Daisy Doe",
-    "weekly hours": 38
+    "Id": 2,
+    "Name": "Daisy Doe",
+    "Weekly_hours": 38
   },
   {
-    "id": 3,
-    "name": "James Smith",
-    "weekly hours": 40
+    "Id": 3,
+    "Name": "James Smith",
+    "Weekly_hours": 40
   },
   {
-    "id": 4,
-    "name": "William Crane",
-    "weekly hours": 30
+    "Id": 4,
+    "Name": "William Crane",
+    "Weekly_hours": 30
   }
 ]

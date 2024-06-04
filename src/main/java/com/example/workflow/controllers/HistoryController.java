@@ -1,6 +1,7 @@
 package com.example.workflow.controllers;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,16 @@ public class HistoryController {
     @GetMapping("/completed-processes")
     public List<HistoricProcessInstance> getCompletedProcesses() {
         return historyService.createHistoricProcessInstanceQuery().finished().list();
+    }
+    @GetMapping("/completed-processes/details")
+    public List<List<HistoricDetail>> getCompletedProcesses2() {
+        List<List<HistoricDetail>> process_variables = new ArrayList<>();
+        List<HistoricProcessInstance> processes = historyService.createHistoricProcessInstanceQuery().finished().orderByProcessInstanceEndTime().asc().list();
+        for (HistoricProcessInstance process : processes) {
+            List<HistoricDetail> details = historyService.createHistoricDetailQuery().processInstanceId(process.getId()).orderByVariableName().asc().list();
+            process_variables.add(details);
+        }
+        return process_variables;
     }
     @GetMapping("/processes")
     public List<HistoricProcessInstance> getProcessInstances() {
