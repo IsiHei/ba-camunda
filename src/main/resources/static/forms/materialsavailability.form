@@ -1,6 +1,22 @@
 {
   "components": [
     {
+      "label": "",
+      "type": "number",
+      "layout": {
+        "row": "Row_17azt7k",
+        "columns": null
+      },
+      "id": "Field_128gej2",
+      "key": "workload_in_hours",
+      "defaultValue": 1,
+      "decimalDigits": 0,
+      "readonly": true,
+      "appearance": {
+        "prefixAdorner": "workload in hours"
+      }
+    },
+    {
       "values": [
         {
           "label": "are available",

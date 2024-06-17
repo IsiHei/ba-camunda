@@ -1,0 +1,28 @@
+{
+  "components": [
+    {
+      "label": "",
+      "type": "number",
+      "layout": {
+        "row": "Row_1bjfmbt",
+        "columns": null
+      },
+      "id": "Field_0g1cnkb",
+      "key": "workload_in_hours",
+      "defaultValue": 2,
+      "readonly": true,
+      "appearance": {
+        "prefixAdorner": "workload in hours"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "requestrawmaterials",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.23.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.21.0",
+  "schemaVersion": 16
+}

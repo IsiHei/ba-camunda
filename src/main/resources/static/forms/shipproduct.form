@@ -1,0 +1,26 @@
+{
+  "components": [
+    {
+      "label": "",
+      "type": "number",
+      "layout": {
+        "row": "Row_1jg8dsz",
+        "columns": null
+      },
+      "id": "Field_0ult6ai",
+      "key": "workload_in_hours",
+      "appearance": {
+        "prefixAdorner": "workload in hours"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "Form_076mz5s",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.23.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.21.0",
+  "schemaVersion": 16
+}

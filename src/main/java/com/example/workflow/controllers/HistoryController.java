@@ -4,6 +4,8 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.model.bpmn.instance.Property;
+import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,8 +16,8 @@ import spinjar.com.minidev.json.parser.ParseException;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -23,15 +25,26 @@ public class HistoryController {
 
     @Autowired
     private HistoryService historyService;
+    private ServiceTask serviceTask;
 
     @GetMapping("/completed-processes")
     public List<HistoricProcessInstance> getCompletedProcesses() {
         return historyService.createHistoricProcessInstanceQuery().finished().list();
     }
     @GetMapping("/completed-processes/details")
-    public List<List<HistoricDetail>> getCompletedProcesses2() {
+    public List<List<HistoricDetail>> getCompletedProcessesDetails() {
         List<List<HistoricDetail>> process_variables = new ArrayList<>();
         List<HistoricProcessInstance> processes = historyService.createHistoricProcessInstanceQuery().finished().orderByProcessInstanceEndTime().asc().list();
+        for (HistoricProcessInstance process : processes) {
+            List<HistoricDetail> details = historyService.createHistoricDetailQuery().processInstanceId(process.getId()).orderByVariableName().asc().list();
+            process_variables.add(details);
+        }
+        return process_variables;
+    }
+    @GetMapping("/processes/details")
+    public List<List<HistoricDetail>> getProcessesDetails() {
+        List<List<HistoricDetail>> process_variables = new ArrayList<>();
+        List<HistoricProcessInstance> processes = historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceStartTime().asc().list();
         for (HistoricProcessInstance process : processes) {
             List<HistoricDetail> details = historyService.createHistoricDetailQuery().processInstanceId(process.getId()).orderByVariableName().asc().list();
             process_variables.add(details);
@@ -44,12 +57,23 @@ public class HistoryController {
     }
     @GetMapping("/activities")
     public List<HistoricActivityInstance> getActivityInstances() {
-        //return historyService.createHistoricJobLogQuery().list();
         return historyService.createHistoricActivityInstanceQuery().list();
+    }
+    @GetMapping("/activities/running")
+    public List<HistoricActivityInstance> getRunningActivityInstances() {
+        return historyService.createHistoricActivityInstanceQuery().unfinished().list();
+    }
+    @GetMapping("/activities/properties")
+    public Collection<Property> get() {
+        return serviceTask.getProperties();
     }
     @GetMapping("/tasks")
     public List<HistoricTaskInstance> getTaskInstances() {
         return historyService.createHistoricTaskInstanceQuery().list();
+    }
+    @GetMapping("/tasks/running")
+    public List<HistoricTaskInstance> getRunningTaskInstances() {
+        return historyService.createHistoricTaskInstanceQuery().unfinished().list();
     }
     @GetMapping("/test")
     public List<String> getTest() {
@@ -62,21 +86,21 @@ public class HistoryController {
     @GetMapping("/projects")
     public JSONArray getProjects() {
         JSONObject unused = new JSONObject();
-        unused.put("Id", "0");
-        unused.put("Hours", "300");
-        unused.put("Name", "unused hours");
+        unused.put("id", "0");
+        unused.put("hours", "300");
+        unused.put("name", "unused hours");
         JSONObject project1 = new JSONObject();
-        project1.put("Id", "1");
-        project1.put("Hours", "100");
-        project1.put("Name", "Project 1");
+        project1.put("id", "1");
+        project1.put("hours", "100");
+        project1.put("name", "Project 1");
         JSONObject project2 = new JSONObject();
-        project2.put("Id", "2");
-        project2.put("Hours", "120");
-        project2.put("Name", "Project 2");
+        project2.put("id", "2");
+        project2.put("hours", "120");
+        project2.put("name", "Project 2");
         JSONObject project3 = new JSONObject();
-        project3.put("Id", "3");
-        project3.put("Hours", "80");
-        project3.put("Name", "Project 3");
+        project3.put("id", "3");
+        project3.put("hours", "80");
+        project3.put("name", "Project 3");
         JSONArray projects = new JSONArray();
         projects.add(unused);
         projects.add(project1);

@@ -16,21 +16,19 @@ export default {
             const project_hours = []
             for (const k in projects) {
                 const project = projects[k];
-                project_names.push(project.Name);
-                project_hours.push(project.Hours)
+                project_names.push(project.name);
+                project_hours.push(project.hours)
             }
             const employees = await getEmployees().valueOf();
             const employee_names = [];
             const employee_hours = [];
             for (const e in employees) {
                 const employee = employees[e];
-                employee_names.push(employee.Name);
-                employee_hours.push(employee.Weekly_hours)
+                employee_names.push(employee.name);
+                employee_hours.push(employee.weekly_hours)
             }
-            console.log(employee_names)
-            console.log(employee_hours)
             node.innerHTML = `
-                <div style="width: 100%; height: 100%; padding-block: 20px; margin: auto; text-align: center;">
+                <div style="width: 100%; height: 100%; margin: auto; text-align: center;">
                     <div style="float:left; width:auto; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
                         <div style="padding-block: 5px;">
                             <span style="width: 100%; font-size: x-large; margin: 20px;">
@@ -152,14 +150,33 @@ export default {
         // Activity: Check request by Group Leader
         else if (activityId === "check_gl") {
             node.innerHTML = `
-                <div>
-                    context for group leader comes here soon ...
-                    <canvas id="pastRequestChart"></canvas>
+            <div style="width: 100%; height: 100%; margin: auto; text-align: center;">
+                 <div style="float:left; width: auto; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
+                    <div style="padding-block: 5px;">
+                            <span style="width: 100%; font-size: x-large; margin: 20px;">
+                                Application History
+                            </span>
+                        </div>
+                    <div style="padding-block: 5px; width: 600px; height: 200px;">   
+                        <canvas id="pastRequestsChart" width="300" height="100"></canvas>
+                    </div>
                 </div>
-            `
+            </div>
+            `;
             const script = document.createElement('script');
             script.src = "https://cdn.jsdelivr.net/npm/chart.js";
+            const statistics = await getApplicationStatistics();
+            const employees = await getEmployees();
+            let employee_names = [];
+            let employee_applications_approved = [];
+            let employee_applications_rejected =[];
+            for (const e of employees) {
+                employee_names.push(e.name);
+                employee_applications_approved.push(statistics[e.id].approved_applications);
+                employee_applications_rejected.push(statistics[e.id].rejected_applications);
+            }
             script.onload = () => {
+                // #accepted vs #rejected applications
                 const pd = document.getElementById('pastRequestsChart').getContext('2d');
                 const projectsDoughnut = new Chart(pd, {
                     type: 'bar',
@@ -167,29 +184,24 @@ export default {
                         labels: employee_names,
                         datasets: [{
                             label: 'accepted applications',
-                            data: employee_applications_accepted,
+                            data: employee_applications_approved,
                             backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(255, 159, 64, 0.2)',
-                                'rgba(255, 205, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(201, 203, 207, 0.2)'
+                                'rgb(14, 112, 28, 0.2)'
                             ],
                             borderColor: [
-                                'rgb(255, 99, 132)',
-                                'rgb(255, 159, 64)',
-                                'rgb(255, 205, 86)',
-                                'rgb(75, 192, 192)',
-                                'rgb(54, 162, 235)',
-                                'rgb(153, 102, 255)',
-                                'rgb(201, 203, 207)'
+                                'rgb(14, 112, 28)'
                             ],
                             borderWidth: 1
                         },{
                             label: 'rejected applications',
-                            data: employee_applications_rejected
+                            data: employee_applications_rejected,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 99, 132)'
+                            ],
+                            borderWidth: 1
 
                         }]
                     },
@@ -198,11 +210,18 @@ export default {
                             y: {
                                 beginAtZero: true,
                                 stacked: true
+                            },
+                            x: {
+                                stacked: true
                             }
                         }
                     }
                 });
-            }
+            };
+            script.onerror = () => {
+                console.error('Chart.js could not be loaded.');
+            };
+            document.head.appendChild(script);
         }
         //without special context
         else {
@@ -297,6 +316,7 @@ export default {
 
             // onclick function for our button
             node.onclick = function () {
+                /*
                 console.log("ID: " + processInstanceId);
                 const processes = processesHistory();
                 processes.then(value => {
@@ -306,6 +326,11 @@ export default {
                 test.then(value => console.log(value));
                 const employees = getEmployees();
                 employees.then(value => console.log(value));
+                 */
+                const variables = getProcessVariables(processInstanceId);
+                variables.then(value => console.log(value));
+                const statistic = getApplicationStatistics();
+                statistic.then(value => console.log(value));
             };
         }
     }
@@ -336,20 +361,39 @@ async function getCompletedProcesses() {
     return await response.json();
 }
 
-async function getApplicationStatistic() {
+async function getApplicationStatistics() {
     // employee_name, #rejected_applications, #accepted_applications
-    const completed_processes = getCompletedProcesses();
-    for (const p in completed_processes) {
-        const process = completed_processes[p];
+    let application_statistics = {};
+    const completed_processes = await getCompletedProcesses();
+    for (const process of completed_processes) {
+        const employee = (await getProcessVariables(process.processInstanceId)).employee;
+        if (!application_statistics.hasOwnProperty(employee)) {
+            application_statistics[employee] = {rejected_applications: 0, approved_applications: 0, name: employee};
+        }
         if (process.processDefinitionKey === 'leave_request') {
-            if (process.endActivityId === 'application_accepted') {
-
+            if (process.endActivityId === 'application_approved') {
+                application_statistics[employee]['approved_applications'] += 1;
             }
             else if (process.endActivityId === 'application_rejected') {
-
+                application_statistics[employee]['rejected_applications'] += 1;
             }
         }
     }
+    return application_statistics;
+}
+
+async function getProcessVariables(processInstanceId) {
+    let variables = {};
+    const variables_response = await (await fetch("http://localhost:8080/processes/details")).json();
+    for (const variables_raw of variables_response) {
+        if (!variables_raw.hasOwnProperty(0)) {}
+        else if (variables_raw[0].processInstanceId === processInstanceId) {
+            for (const variable_raw of variables_raw) {
+                variables[variable_raw.name] = variable_raw.value;
+            }
+        }
+    }
+    return variables;
 }
 
 async function getCurrentActivity(api, processInstanceId) {
