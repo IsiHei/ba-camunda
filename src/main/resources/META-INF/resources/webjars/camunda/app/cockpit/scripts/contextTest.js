@@ -160,6 +160,16 @@ export default {
                     <div style="padding-block: 5px; width: 600px; height: 200px;">   
                         <canvas id="pastRequestsChart" width="300" height="100"></canvas>
                     </div>
+                    <div style="float:left; width: 600px; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
+                        <div style="padding-block: 5px;">
+                            <span style="width: 100%; font-size: x-large; margin: 20px">
+                                Weekly hours per employee
+                            </span>
+                        </div>
+                        <div style="padding-block: 5px;">   
+                            <canvas id="currentWorkloadChart" width="50" height="20"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
             `;
@@ -167,18 +177,21 @@ export default {
             script.src = "https://cdn.jsdelivr.net/npm/chart.js";
             const statistics = await getApplicationStatistics();
             const employees = await getEmployees();
+            // rearrange data as needed for graphic historicBar
             let employee_names = [];
             let employee_applications_approved = [];
             let employee_applications_rejected =[];
             for (const e of employees) {
-                employee_names.push(e.name);
-                employee_applications_approved.push(statistics[e.id].approved_applications);
-                employee_applications_rejected.push(statistics[e.id].rejected_applications);
+                if (statistics.hasOwnProperty(e.id)) { //check if employee even has a leave application history
+                    employee_names.push(e.name);
+                    employee_applications_approved.push(statistics[e.id].approved_applications);
+                    employee_applications_rejected.push(statistics[e.id].rejected_applications);
+                }
             }
             script.onload = () => {
                 // #accepted vs #rejected applications
                 const pd = document.getElementById('pastRequestsChart').getContext('2d');
-                const projectsDoughnut = new Chart(pd, {
+                const historyBar = new Chart(pd, {
                     type: 'bar',
                     data: {
                         labels: employee_names,
@@ -217,6 +230,17 @@ export default {
                         }
                     }
                 });
+                // current workload per employee
+                //TODO check if getContext('2d') is needed and why
+                const cw = document.getElementById('currentWorkloadChart').getContext('2d');
+                const workloadBar = new Chart(cw, {
+                    type: 'bar',
+                    data: {
+                        labels: employee_names
+                        // TODO: stacked Bar (e.g. 3+7 for employeeX)
+                    }
+                });
+                // TODO
             };
             script.onerror = () => {
                 console.error('Chart.js could not be loaded.');
@@ -331,6 +355,8 @@ export default {
                 variables.then(value => console.log(value));
                 const statistic = getApplicationStatistics();
                 statistic.then(value => console.log(value));
+                const user_workload = userWorkload();
+                user_workload.then(value => console.log(value));
             };
         }
     }
@@ -411,4 +437,18 @@ async function getCurrentActivity(api, processInstanceId) {
     activityId = value.childActivityInstances[0].activityId
     activityName = value.childActivityInstances[0].activityName
     return {"id": activityId, "name": activityName}
+}
+
+//  { user_1: {activityID_1: working hours_1, ..., activityID_n: working hours_n}, ... }
+async function userWorkload()  {
+    const activities = await (await fetch("http://localhost:8080/activities/running")).json();
+    let user_activities = {}
+    for (const activity of activities) {
+        const variables = await getProcessVariables(activity.processInstanceId)
+        if (activity.processDefinitionKey === 'order') {
+            if (!user_activities.hasOwnProperty(activity.assignee)) {user_activities[activity.assignee] = {}}
+            user_activities[activity.assignee][activity.id] = variables['workload_in_hours'];
+        }
+    }
+    return user_activities;
 }

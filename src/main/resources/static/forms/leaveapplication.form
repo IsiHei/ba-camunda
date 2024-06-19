@@ -4,19 +4,19 @@
       "values": [
         {
           "label": "John Miller",
-          "value": "jason_miller"
+          "value": "jasonmiller"
         },
         {
           "label": "Daisy Doe",
-          "value": "daisy_doe"
+          "value": "daisydoe"
         },
         {
           "label": "James Smith",
-          "value": "james_smith"
+          "value": "jamessmith"
         },
         {
           "label": "William Crane",
-          "value": "william_crane"
+          "value": "williamcrane"
         }
       ],
       "label": "Name",

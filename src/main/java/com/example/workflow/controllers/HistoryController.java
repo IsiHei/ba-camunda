@@ -63,10 +63,7 @@ public class HistoryController {
     public List<HistoricActivityInstance> getRunningActivityInstances() {
         return historyService.createHistoricActivityInstanceQuery().unfinished().list();
     }
-    @GetMapping("/activities/properties")
-    public Collection<Property> get() {
-        return serviceTask.getProperties();
-    }
+
     @GetMapping("/tasks")
     public List<HistoricTaskInstance> getTaskInstances() {
         return historyService.createHistoricTaskInstanceQuery().list();

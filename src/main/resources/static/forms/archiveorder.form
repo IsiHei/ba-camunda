@@ -11,7 +11,9 @@
       "key": "workload_in_hours",
       "appearance": {
         "prefixAdorner": "workload in hours"
-      }
+      },
+      "defaultValue": 1,
+      "readonly": true
     }
   ],
   "type": "default",

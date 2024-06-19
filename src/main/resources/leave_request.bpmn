@@ -36,11 +36,11 @@
       <bpmn:incoming>Flow_0zrexqf</bpmn:incoming>
       <bpmn:outgoing>Flow_0qur6io</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:userTask id="check_dm" name="Check request by Department Manager" camunda:formKey="camunda-forms:/forms/checkleaverequest.form">
+    <bpmn:userTask id="check_dm" name="Check request by Department Manager" camunda:formKey="camunda-forms:/forms/checkleaverequest.form" camunda:assignee="admin" camunda:candidateUsers="admin">
       <bpmn:incoming>Flow_0ut9459</bpmn:incoming>
       <bpmn:outgoing>Flow_1os9dlz</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:userTask id="check_gl" name="Check request by Group Leader" camunda:formKey="camunda-forms:/forms/checkleaverequest.form">
+    <bpmn:userTask id="check_gl" name="Check request by Group Leader" camunda:formKey="camunda-forms:/forms/checkleaverequest.form" camunda:assignee="admin" camunda:candidateUsers="admin">
       <bpmn:incoming>Flow_0ul4h6f</bpmn:incoming>
       <bpmn:outgoing>Flow_0zrexqf</bpmn:outgoing>
     </bpmn:userTask>
@@ -76,7 +76,7 @@
       <bpmn:incoming>Flow_0o22dfg</bpmn:incoming>
       <bpmn:outgoing>Flow_18q222q</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:userTask id="Activity_16i35y8" name="Confirm Leave Application" camunda:formKey="camunda-forms:/forms/confirmleaverequest.form">
+    <bpmn:userTask id="Activity_16i35y8" name="Confirm Leave Application" camunda:formKey="camunda-forms:/forms/confirmleaverequest.form" camunda:assignee="admin" camunda:candidateUsers="admin">
       <bpmn:incoming>Flow_18q222q</bpmn:incoming>
       <bpmn:outgoing>Flow_1x1yroc</bpmn:outgoing>
     </bpmn:userTask>
