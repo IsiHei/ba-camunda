@@ -30,22 +30,37 @@
     </bpmn:exclusiveGateway>
     <bpmn:userTask id="check_stock_availability" name="Check stock availability" camunda:formKey="camunda-forms:/forms/orderavailability.form">
       <bpmn:extensionElements>
-        <camunda:properties>
-          <camunda:property name="WorkloadHours" value="2" />
-        </camunda:properties>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="workload_in_hours">2   </camunda:inputParameter>
+        </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>sid-ADB0E387-EEA4-49BE-9C75-ABFA5AE519F5</bpmn:incoming>
       <bpmn:outgoing>sid-C1D2B317-E082-4A89-8123-ED8DD8054CA3</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:userTask id="retrieve_product_from_warehouse" name="Retrieve product from&#10;warehouse">
+    <bpmn:userTask id="retrieve_product_from_warehouse" name="Retrieve product from&#10;warehouse" camunda:formKey="camunda-forms:/forms/retrievewarehouse.form">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="workload_in_hours">4</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
       <bpmn:incoming>sid-76CA3F67-F1B1-4243-90C1-516097FB0391</bpmn:incoming>
       <bpmn:outgoing>Flow_0zvqpmd</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:userTask id="check_raw_materials_availability" name="Check raw materials availability" camunda:formKey="camunda-forms:/forms/materialsavailability.form">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="workload_in_hours">1</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
       <bpmn:incoming>sid-11C55EC7-ECB7-4DE5-81E3-EE7740A48638</bpmn:incoming>
       <bpmn:outgoing>sid-32D38B6C-863F-4994-8368-3039BDBB1828</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:userTask id="request_raw_materials" name="Request raw materials">
+    <bpmn:userTask id="request_raw_materials" name="Request raw materials" camunda:formKey="camunda-forms:/forms/requestrawmaterials.form">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="workload_in_hours">2</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
       <bpmn:incoming>materials_are_not_available_flow</bpmn:incoming>
       <bpmn:outgoing>Flow_0s7oxmn</bpmn:outgoing>
     </bpmn:userTask>
@@ -53,16 +68,17 @@
       <bpmn:incoming>Flow_0s7oxmn</bpmn:incoming>
       <bpmn:outgoing>sid-A9CD9357-BEEF-457D-A004-8973111E0D3F</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:task id="manufacture_product" name="Manufacture product">
-      <bpmn:incoming>sid-787AE6FF-E4EE-4C96-AF98-143B1771C0BA</bpmn:incoming>
-      <bpmn:outgoing>sid-CC800A7A-C0B9-43F4-9575-6DB090155253</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:parallelGateway id="sid-EF76E428-2E98-476F-90D8-CEA9EDCE7D6E" name="" gatewayDirection="Diverging">
       <bpmn:incoming>sid-6F8E5910-5FD1-471B-8F11-F36BB13E3339</bpmn:incoming>
       <bpmn:outgoing>sid-77759F41-41C4-4DFE-ACB1-EC2D62ACA32E</bpmn:outgoing>
       <bpmn:outgoing>sid-3F678FB7-6984-45FA-87F5-2251F52C9533</bpmn:outgoing>
     </bpmn:parallelGateway>
-    <bpmn:userTask id="emit_invoice" name="Emit invoice">
+    <bpmn:userTask id="emit_invoice" name="Emit invoice" camunda:formKey="camunda-forms:/forms/emitinvoice.form">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="workload_in_hours">1</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
       <bpmn:incoming>sid-77759F41-41C4-4DFE-ACB1-EC2D62ACA32E</bpmn:incoming>
       <bpmn:outgoing>sid-FB5A97D8-2AF3-44C1-BB86-606D89B15C75</bpmn:outgoing>
     </bpmn:userTask>
@@ -74,14 +90,15 @@
       <bpmn:incoming>sid-F3E4255E-D4F9-4433-AE21-97AA834E7C6C</bpmn:incoming>
       <bpmn:outgoing>sid-28BAB6B0-7716-4379-A081-051E897640C6</bpmn:outgoing>
     </bpmn:parallelGateway>
-    <bpmn:userTask id="archive_order" name="Archive order">
+    <bpmn:userTask id="archive_order" name="Archive order" camunda:formKey="camunda-forms:/forms/archiveorder.form">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="workload_in_hours">1</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
       <bpmn:incoming>sid-28BAB6B0-7716-4379-A081-051E897640C6</bpmn:incoming>
       <bpmn:outgoing>sid-0D47156C-79C2-4C68-8EA8-D5CE83DC9A29</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:task id="ship_product" name="Ship product">
-      <bpmn:incoming>sid-3973093F-28A5-405C-9608-AC884B8C1749</bpmn:incoming>
-      <bpmn:outgoing>sid-F3E4255E-D4F9-4433-AE21-97AA834E7C6C</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:task id="recieve_payment" name="Receive payment">
       <bpmn:incoming>sid-FB5A97D8-2AF3-44C1-BB86-606D89B15C75</bpmn:incoming>
       <bpmn:outgoing>sid-A974D977-A13A-4ED4-8693-9CA71144372C</bpmn:outgoing>
@@ -90,7 +107,12 @@
       <bpmn:incoming>sid-3F678FB7-6984-45FA-87F5-2251F52C9533</bpmn:incoming>
       <bpmn:outgoing>sid-3973093F-28A5-405C-9608-AC884B8C1749</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:userTask id="confirm_order" name="Confirm order">
+    <bpmn:userTask id="confirm_order" name="Confirm order" camunda:formKey="camunda-forms:/forms/confirmorder.form">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="workload_in_hours">4</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_18j08u8</bpmn:incoming>
       <bpmn:outgoing>sid-6F8E5910-5FD1-471B-8F11-F36BB13E3339</bpmn:outgoing>
     </bpmn:userTask>
@@ -104,7 +126,9 @@
     <bpmn:sequenceFlow id="sid-76CA3F67-F1B1-4243-90C1-516097FB0391" name="Yes" sourceRef="sid-13C16184-A76C-4172-9D54-C57BA321C1BE" targetRef="retrieve_product_from_warehouse">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{available== 'yes'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="sid-ADB0E387-EEA4-49BE-9C75-ABFA5AE519F5" name="" sourceRef="incoming_order" targetRef="check_stock_availability" />
+    <bpmn:sequenceFlow id="sid-ADB0E387-EEA4-49BE-9C75-ABFA5AE519F5" name="" sourceRef="incoming_order" targetRef="check_stock_availability">
+      <bpmn:extensionElements />
+    </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="sid-32D38B6C-863F-4994-8368-3039BDBB1828" name="" sourceRef="check_raw_materials_availability" targetRef="sid-25A37BBB-C97A-4DF2-876D-80BADDA24A08" />
     <bpmn:sequenceFlow id="materials_are_not_available_flow" name="No" sourceRef="sid-25A37BBB-C97A-4DF2-876D-80BADDA24A08" targetRef="request_raw_materials">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{materials_available=='no'}</bpmn:conditionExpression>
@@ -124,6 +148,24 @@
     <bpmn:sequenceFlow id="sid-F3E4255E-D4F9-4433-AE21-97AA834E7C6C" name="" sourceRef="ship_product" targetRef="sid-2662BA89-F240-4B0D-9048-46AC7EDB55A5" />
     <bpmn:sequenceFlow id="sid-28BAB6B0-7716-4379-A081-051E897640C6" name="" sourceRef="sid-2662BA89-F240-4B0D-9048-46AC7EDB55A5" targetRef="archive_order" />
     <bpmn:sequenceFlow id="sid-3973093F-28A5-405C-9608-AC884B8C1749" name="" sourceRef="get_shipping_address" targetRef="ship_product" />
+    <bpmn:userTask id="ship_product" name="Ship product" camunda:formKey="camunda-forms:/forms/shipproduct.form">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="workload_in_hours">3</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>sid-3973093F-28A5-405C-9608-AC884B8C1749</bpmn:incoming>
+      <bpmn:outgoing>sid-F3E4255E-D4F9-4433-AE21-97AA834E7C6C</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="manufacture_product" name="Manufacture product" camunda:formKey="camunda-forms:/forms/manufactureproduct.form">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="workload_in_hours">10</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>sid-787AE6FF-E4EE-4C96-AF98-143B1771C0BA</bpmn:incoming>
+      <bpmn:outgoing>sid-CC800A7A-C0B9-43F4-9575-6DB090155253</bpmn:outgoing>
+    </bpmn:userTask>
   </bpmn:process>
   <bpmn:message id="Message_14c6vut" name="messsage-incoming-order" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -171,9 +213,6 @@
       <bpmndi:BPMNShape id="Activity_0g77sc5_di" bpmnElement="obtain_raw_materials">
         <dc:Bounds x="680" y="128" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0bmthoq_di" bpmnElement="manufacture_product">
-        <dc:Bounds x="680" y="341" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="sid-EF76E428-2E98-476F-90D8-CEA9EDCE7D6E_gui" bpmnElement="sid-EF76E428-2E98-476F-90D8-CEA9EDCE7D6E">
         <dc:Bounds x="870" y="599" width="40" height="40" />
       </bpmndi:BPMNShape>
@@ -190,9 +229,6 @@
       <bpmndi:BPMNShape id="Activity_1ifq3z4_di" bpmnElement="archive_order">
         <dc:Bounds x="1477" y="698" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0e56kgw_di" bpmnElement="ship_product">
-        <dc:Bounds x="1177" y="579" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_012qdl2_di" bpmnElement="recieve_payment">
         <dc:Bounds x="1177" y="698" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -201,6 +237,12 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1c3at9i_di" bpmnElement="confirm_order">
         <dc:Bounds x="840" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0demgc8_di" bpmnElement="ship_product">
+        <dc:Bounds x="1177" y="579" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_15db8b9_di" bpmnElement="manufacture_product">
+        <dc:Bounds x="680" y="341" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="sid-CC800A7A-C0B9-43F4-9575-6DB090155253_gui" bpmnElement="sid-CC800A7A-C0B9-43F4-9575-6DB090155253">
         <di:waypoint x="730" y="421" />

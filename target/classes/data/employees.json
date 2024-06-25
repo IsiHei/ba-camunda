@@ -1,21 +1,21 @@
 [
   {
-    "id": "jason_miller",
+    "id": "jasonmiller",
     "name": "Jason Miller",
     "weekly_hours": 20
   },
   {
-    "id": "daisy_doe",
+    "id": "daisydoe",
     "name": "Daisy Doe",
     "weekly_hours": 38
   },
   {
-    "id": "james_smith",
+    "id": "jamessmith",
     "name": "James Smith",
     "weekly_hours": 40
   },
   {
-    "id": "william_crane",
+    "id": "williamcrane",
     "name": "William Crane",
     "weekly_hours": 30
   }

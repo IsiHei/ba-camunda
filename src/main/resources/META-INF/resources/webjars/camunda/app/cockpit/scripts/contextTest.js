@@ -157,30 +157,54 @@ export default {
                                 Application History
                             </span>
                         </div>
-                    <div style="padding-block: 5px; width: 600px; height: 200px;">   
-                        <canvas id="pastRequestsChart" width="300" height="100"></canvas>
+                    <div style="padding-block: 5px;">   
+                        <canvas id="pastRequestsChart" width="600" height="300"></canvas>
+                    </div>     
+                </div>
+                <div style="float:left; width: auto; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
+                    <div style="padding-block: 5px;">
+                        <span style="width: 100%; font-size: x-large; margin: 20px">
+                            Current Workload
+                        </span>
                     </div>
-                    <div style="float:left; width: 600px; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
-                        <div style="padding-block: 5px;">
-                            <span style="width: 100%; font-size: x-large; margin: 20px">
-                                Weekly hours per employee
-                            </span>
-                        </div>
-                        <div style="padding-block: 5px;">   
-                            <canvas id="currentWorkloadChart" width="50" height="20"></canvas>
-                        </div>
+                    <div style="padding-block: 5px;">   
+                        <canvas id="currentWorkloadChart" width="1400" height="700"></canvas>
                     </div>
                 </div>
             </div>
             `;
+            const script1 = document.createElement('script');
+            script1.src = "https://cdn.jsdelivr.net/npm/chart.js";
+            script1.async = false;
+            script1.onerror = () => {
+                console.error('Chart.js could not be loaded.');
+            };
+            document.body.appendChild(script1);
             const script = document.createElement('script');
-            script.src = "https://cdn.jsdelivr.net/npm/chart.js";
+            script.async = false;
+            script.src = "https://cdn.jsdelivr.net/npm//chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"
+            /*
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js";
+            script.integrity = "sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig==";
+            script.crossOrigin = "anonymous";
+            script.referrerpolicy = "no-referrer";
+            */
+            /*
+            script2.async = false;
+            script2.onerror = () => {
+                console.error('chartjs-plugin-datalabels could not be loaded.');
+            };
+            document.body.appendChild(script2);
+            const script = document.createElement('script');
+            script.async = false;
+            */
+
             const statistics = await getApplicationStatistics();
             const employees = await getEmployees();
             // rearrange data as needed for graphic historicBar
             let employee_names = [];
             let employee_applications_approved = [];
-            let employee_applications_rejected =[];
+            let employee_applications_rejected = [];
             for (const e of employees) {
                 if (statistics.hasOwnProperty(e.id)) { //check if employee even has a leave application history
                     employee_names.push(e.name);
@@ -188,6 +212,59 @@ export default {
                     employee_applications_rejected.push(statistics[e.id].rejected_applications);
                 }
             }
+            //Data preparation for workload chart
+            let datasets = [];
+            let labels = [];
+            let annotations = {};
+            const workload = await getUserWorkload();
+            let n = 0;
+            for (const a in workload) {
+                let assignee = workload[a];
+                let assigneeName = '';
+                if (a === 'null') {
+                    assigneeName = 'not assigned'
+                    labels.push('not assigned');
+                }
+                 else {
+                     assigneeName = await getEmployeeName(a);
+                     labels.push(assigneeName);
+                }
+                 let yAnnotation = 0;
+                 let m = 0;
+                for (const activity in assignee) {
+                    let activityWorkload = assignee[activity];
+                    let data = new Array(workload.length);
+                    yAnnotation += activityWorkload/2;
+                    data[n] = activityWorkload;
+                    let r = Math.floor(Math.random() * 254) + 1
+                    let g = Math.floor(Math.random() * 254) + 1
+                    let b = Math.floor(Math.random() * 254) + 1
+                    let dataset = {
+                        data: data,
+                        label: activity,
+                        backgroundColor: [
+                            ('rgba('+r+','+g+','+b+',0.2)')
+                        ],
+                        borderColor: [
+                            ('rgba('+r+','+g+','+b+',0.9)')
+                        ],
+                        borderWidth: 1
+                    }
+                    annotations[('label'+n+'_'+m)] = {
+                        type: 'label',
+                        xValue: assigneeName,
+                        yValue: yAnnotation,
+                        content: [await getActivitieName(activity)],
+                        position: 'center'
+                    }
+                    datasets.push(dataset);
+                    yAnnotation += activityWorkload/2;
+                    m++;
+                }
+                n++;
+            }
+
+            //Load Script for Group Leader context charts
             script.onload = () => {
                 // #accepted vs #rejected applications
                 const pd = document.getElementById('pastRequestsChart').getContext('2d');
@@ -205,7 +282,7 @@ export default {
                                 'rgb(14, 112, 28)'
                             ],
                             borderWidth: 1
-                        },{
+                        }, {
                             label: 'rejected applications',
                             data: employee_applications_rejected,
                             backgroundColor: [
@@ -222,7 +299,10 @@ export default {
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                stacked: true
+                                stacked: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
                             },
                             x: {
                                 stacked: true
@@ -231,19 +311,66 @@ export default {
                     }
                 });
                 // current workload per employee
+                /* TODO: Test later?
+                const LabelNames = {
+                    id: 'LabelNames',
+                    afterDatasetsDraw(chart, args, pluginOptions) {
+                        const { ctx } = chart;
+
+                    }
+                }*/
                 //TODO check if getContext('2d') is needed and why
                 const cw = document.getElementById('currentWorkloadChart').getContext('2d');
                 const workloadBar = new Chart(cw, {
                     type: 'bar',
                     data: {
-                        labels: employee_names
-                        // TODO: stacked Bar (e.g. 3+7 for employeeX)
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stacked: true,
+                                ticks: {
+                                    stepSize: 5
+                                },
+                                suggestedMax: 40,
+                                grid: {
+                                    drawBorder: false,
+                                    color: function(context) {
+                                        if (context.tick.value === 20 || context.tick.value === 30 || context.tick.value === 40) {
+                                            return 'rgba(0, 0, 0, 0.2)'; // Farbe der dickeren Linie
+                                        }
+                                        return 'rgba(0, 0, 0, 0.1)'; // Standardfarbe der Linie
+                                    },
+                                    lineWidth: function(context) {
+                                        if (context.tick.value === 20 || context.tick.value === 30 || context.tick.value === 40) {
+                                            return 2; // Dickere Linie
+                                        }
+                                        return 1; // Standarddicke der Linie
+                                    }
+                                }
+                            },
+                            x: {
+                                stacked: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            annotation: {
+                                annotations: annotations
+                            }
+                        }
                     }
                 });
                 // TODO
             };
             script.onerror = () => {
-                console.error('Chart.js could not be loaded.');
+                console.error('chartjs-plugin-datalabels an charts could not be loaded.');
             };
             document.head.appendChild(script);
         }
@@ -355,7 +482,7 @@ export default {
                 variables.then(value => console.log(value));
                 const statistic = getApplicationStatistics();
                 statistic.then(value => console.log(value));
-                const user_workload = userWorkload();
+                const user_workload = getUserWorkload();
                 user_workload.then(value => console.log(value));
             };
         }
@@ -440,7 +567,7 @@ async function getCurrentActivity(api, processInstanceId) {
 }
 
 //  { user_1: {activityID_1: working hours_1, ..., activityID_n: working hours_n}, ... }
-async function userWorkload()  {
+async function getUserWorkload()  {
     const activities = await (await fetch("http://localhost:8080/activities/running")).json();
     let user_activities = {}
     for (const activity of activities) {
@@ -451,4 +578,23 @@ async function userWorkload()  {
         }
     }
     return user_activities;
+}
+
+async function getEmployeeName(employeeId) {
+    let employees = await getEmployees();
+    for (const employee of employees) {
+        if (employee.id === employeeId) {
+            return employee.name;
+        }
+    }
+    return 'no name found'
+}
+
+async function getActivitieName(activitieId)  {
+    let activities = await (await fetch("http://localhost:8080/activities/running")).json();
+    for (const activity of activities) {
+        if (activity.id === activitieId) {
+            return activity.activityName
+        }
+    }
 }

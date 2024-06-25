@@ -1,6 +1,23 @@
 {
   "components": [
     {
+      "label": "",
+      "type": "number",
+      "layout": {
+        "row": "Row_15gfvqe",
+        "columns": null
+      },
+      "id": "Field_0ne7b5q",
+      "key": "workload_in_hours",
+      "defaultValue": 2,
+      "decimalDigits": 0,
+      "validate": {},
+      "readonly": true,
+      "appearance": {
+        "prefixAdorner": "workload in hours"
+      }
+    },
+    {
       "values": [
         {
           "label": "is available",
