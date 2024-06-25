@@ -7,7 +7,11 @@ export default {
     render: async (node, {api, processInstanceId}) => {
         const activity = await getCurrentActivity(api, processInstanceId)
         const activityId = await activity.id
-
+        // get Variables of Process
+        const variables = await getProcessVariables(processInstanceId)
+        let employeeName = await getEmployeeName(variables.employee)
+        let startTime = new Date(variables.start_year, variables.start_month, variables.start_day);
+        let endTime = new Date(variables.end_year, variables.end_month, variables.end_day)
         // Process: Vacation Request
         // Activity: Check request by Department Manager
         if (activityId === "check_dm") {
@@ -19,34 +23,56 @@ export default {
                 project_names.push(project.name);
                 project_hours.push(project.hours)
             }
-            const employees = await getEmployees().valueOf();
-            const employee_names = [];
-            const employee_hours = [];
-            for (const e in employees) {
-                const employee = employees[e];
-                employee_names.push(employee.name);
-                employee_hours.push(employee.weekly_hours)
+
+            const statistics = await getApplicationStatistics();
+            const employees = await getEmployees();
+            // rearrange data as needed for graphic historicBar
+            let employee_names = [];
+            let employee_applications_approved = [];
+            let employee_applications_rejected = [];
+            for (const e of employees) {
+                if (statistics.hasOwnProperty(e.id)) { //check if employee even has a leave application history
+                    employee_names.push(e.name);
+                    employee_applications_approved.push(statistics[e.id].approved_applications);
+                    employee_applications_rejected.push(statistics[e.id].rejected_applications);
+                }
             }
             node.innerHTML = `
                 <div style="width: 100%; height: 100%; margin: auto; text-align: center;">
                     <div style="float:left; width:auto; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
                         <div style="padding-block: 5px;">
                             <span style="width: 100%; font-size: x-large; margin: 20px;">
-                                Needed hours for ongoing projects
+                                Needed hours per month
                             </span>
                         </div>
                         <div style="padding-block: 5px;">   
-                            <canvas id="projectsDoughnut" width="10" height="10"></canvas>
+                            <canvas id="projectsDoughnut" width="500" height="500"></canvas>
                         </div>
                     </div>
-                    <div style="float:left; width: 600px; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
+                    <div style="float:left; width: auto; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
+                        <div style="padding-block: 5px;">
+                                <span style="width: 100%; font-size: x-large; margin: 20px;">
+                                    Application History
+                                </span>
+                            </div>
+                        <div style="padding-block: 5px;">   
+                            <canvas id="pastRequestsChart" width="1000" height="500"></canvas>
+                        </div>     
+                    </div>
+                    <div style="float:left; width: auto; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
                         <div style="padding-block: 5px;">
                             <span style="width: 100%; font-size: x-large; margin: 20px">
-                                Weekly hours per employee
+                                Variables
                             </span>
                         </div>
-                        <div style="padding-block: 5px;">   
-                            <canvas id="weeklyHoursChart" width="50" height="20"></canvas>
+                        <div style=" width: 300px; margin: auto;">   
+                            <table style="width: 92%; margin: 4%; text-align: left;">
+                                <!--<tr><th style="padding-bottom: 10px;">Name</th><th style="padding-bottom: 10px;">Value</th></tr>-->
+                                <tr><td style="padding-bottom: 15px;">Employee</td><td style="padding-bottom: 15px;">`+ employeeName +`</td></tr>
+                                <tr><td>Start Date</td><td>`+ startTime.toDateString() +`</td></tr>
+                                <tr><td style="border-bottom: 4px double gray;">End Date</td><td style="border-bottom: 4px double gray;">`+ endTime.toDateString() +`</td></tr>
+                                <tr><td>→ Requested Days</td><td>`+ (startTime-endTime) +`</td></tr>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -54,6 +80,51 @@ export default {
             const script = document.createElement('script');
             script.src = "https://cdn.jsdelivr.net/npm/chart.js";
             script.onload = () => {
+                // #accepted vs #rejected applications
+                const pr = document.getElementById('pastRequestsChart').getContext('2d');
+                const historyBar = new Chart(pr, {
+                    type: 'bar',
+                    data: {
+                        labels: employee_names,
+                        datasets: [{
+                            label: 'accepted applications',
+                            data: employee_applications_approved,
+                            backgroundColor: [
+                                'rgb(14, 112, 28, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(14, 112, 28)'
+                            ],
+                            borderWidth: 1
+                        }, {
+                            label: 'rejected applications',
+                            data: employee_applications_rejected,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 99, 132)'
+                            ],
+                            borderWidth: 1
+
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stacked: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            },
+                            x: {
+                                stacked: true
+                            }
+                        }
+                    }
+                });
+                //Ongoing Projects
                 const pd = document.getElementById('projectsDoughnut').getContext('2d');
                 const projectsDoughnut = new Chart(pd, {
                     type: 'doughnut',
@@ -93,7 +164,7 @@ export default {
                         responsive: true,
                         plugins: {
                             legend: {
-                                position: 'bottom'
+                                position: 'top'
                             },
                             title: {
                                 display: false,
@@ -102,44 +173,7 @@ export default {
                         }
                     }
                 });
-                // weekly hours for every employee
-                const whc = document.getElementById('weeklyHoursChart').getContext('2d');
-                const whChart = new Chart(whc, {
-                    type: 'bar',
-                    data: {
-                        labels: employee_names,
-                        datasets: [{
-                            label: 'weekly hours',
-                            data: employee_hours,
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(255, 159, 64, 0.2)',
-                                'rgba(255, 205, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(201, 203, 207, 0.2)'
-                            ],
-                            borderColor: [
-                                'rgb(255, 99, 132)',
-                                'rgb(255, 159, 64)',
-                                'rgb(255, 205, 86)',
-                                'rgb(75, 192, 192)',
-                                'rgb(54, 162, 235)',
-                                'rgb(153, 102, 255)',
-                                'rgb(201, 203, 207)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
+
             }
             script.onerror = () => {
                 console.error('Chart.js could not be loaded.');
@@ -152,15 +186,15 @@ export default {
             node.innerHTML = `
             <div style="width: 100%; height: 100%; margin: auto; text-align: center;">
                  <div style="float:left; width: auto; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
-                    <div style="padding-block: 5px;">
-                            <span style="width: 100%; font-size: x-large; margin: 20px;">
-                                Application History
+                        <div style="padding-block: 5px;">
+                            <span style="width: 100%; font-size: x-large; margin: 20px">
+                                Weekly hours per employee
                             </span>
                         </div>
-                    <div style="padding-block: 5px;">   
-                        <canvas id="pastRequestsChart" width="600" height="300"></canvas>
-                    </div>     
-                </div>
+                        <div style="padding-block: 5px;">   
+                            <canvas id="weeklyHoursChart" width="400" height="700"></canvas>
+                        </div>
+                    </div>
                 <div style="float:left; width: auto; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
                     <div style="padding-block: 5px;">
                         <span style="width: 100%; font-size: x-large; margin: 20px">
@@ -169,6 +203,22 @@ export default {
                     </div>
                     <div style="padding-block: 5px;">   
                         <canvas id="currentWorkloadChart" width="1400" height="700"></canvas>
+                    </div>
+                </div>
+                <div style="float:left; width: auto; height: auto; border-width: thin; border-color: lightgray; border-style: solid; border-radius: 10px; margin: 10px;">
+                    <div style="padding-block: 5px;">
+                        <span style="width: 100%; font-size: x-large; margin: 20px">
+                            Variables
+                        </span>
+                    </div>
+                    <div style=" width: 300px; margin: auto;">   
+                        <table style="width: 92%; margin: 4%; text-align: left;">
+                            <!--<tr><th style="padding-bottom: 10px;">Name</th><th style="padding-bottom: 10px;">Value</th></tr>-->
+                            <tr><td style="padding-bottom: 15px;">Employee</td><td style="padding-bottom: 15px;">`+ employeeName +`</td></tr>
+                            <tr><td>Start Date</td><td>`+ startTime.toDateString() +`</td></tr>
+                            <tr><td style="border-bottom: 4px double gray;">End Date</td><td style="border-bottom: 4px double gray;">`+ endTime.toDateString() +`</td></tr>
+                            <tr><td>→ Requested Days</td><td>`+ (startTime-endTime) +`</td></tr>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -183,35 +233,15 @@ export default {
             const script = document.createElement('script');
             script.async = false;
             script.src = "https://cdn.jsdelivr.net/npm//chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"
-            /*
-            script.src = "https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js";
-            script.integrity = "sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig==";
-            script.crossOrigin = "anonymous";
-            script.referrerpolicy = "no-referrer";
-            */
-            /*
-            script2.async = false;
-            script2.onerror = () => {
-                console.error('chartjs-plugin-datalabels could not be loaded.');
-            };
-            document.body.appendChild(script2);
-            const script = document.createElement('script');
-            script.async = false;
-            */
-
-            const statistics = await getApplicationStatistics();
-            const employees = await getEmployees();
-            // rearrange data as needed for graphic historicBar
-            let employee_names = [];
-            let employee_applications_approved = [];
-            let employee_applications_rejected = [];
-            for (const e of employees) {
-                if (statistics.hasOwnProperty(e.id)) { //check if employee even has a leave application history
-                    employee_names.push(e.name);
-                    employee_applications_approved.push(statistics[e.id].approved_applications);
-                    employee_applications_rejected.push(statistics[e.id].rejected_applications);
-                }
+            const employees = await getEmployees().valueOf();
+            const employee_names = [];
+            const employee_hours = [];
+            for (const e in employees) {
+                const employee = employees[e];
+                employee_names.push(employee.name);
+                employee_hours.push(employee.weekly_hours)
             }
+
             //Data preparation for workload chart
             let datasets = [];
             let labels = [];
@@ -254,7 +284,7 @@ export default {
                         type: 'label',
                         xValue: assigneeName,
                         yValue: yAnnotation,
-                        content: [await getActivitieName(activity)],
+                        content: [await getActivityName(activity)],
                         position: 'center'
                     }
                     datasets.push(dataset);
@@ -266,50 +296,50 @@ export default {
 
             //Load Script for Group Leader context charts
             script.onload = () => {
-                // #accepted vs #rejected applications
-                const pd = document.getElementById('pastRequestsChart').getContext('2d');
-                const historyBar = new Chart(pd, {
+                // weekly hours for every employee
+                const whc = document.getElementById('weeklyHoursChart').getContext('2d');
+                const whChart = new Chart(whc, {
                     type: 'bar',
                     data: {
                         labels: employee_names,
                         datasets: [{
-                            label: 'accepted applications',
-                            data: employee_applications_approved,
+                            label: 'weekly hours',
+                            data: employee_hours,
                             backgroundColor: [
-                                'rgb(14, 112, 28, 0.2)'
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(255, 159, 64, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(201, 203, 207, 0.2)'
                             ],
                             borderColor: [
-                                'rgb(14, 112, 28)'
+                                'rgb(255, 99, 132)',
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(54, 162, 235)',
+                                'rgb(153, 102, 255)',
+                                'rgb(201, 203, 207)'
                             ],
                             borderWidth: 1
-                        }, {
-                            label: 'rejected applications',
-                            data: employee_applications_rejected,
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)'
-                            ],
-                            borderColor: [
-                                'rgb(255, 99, 132)'
-                            ],
-                            borderWidth: 1
-
                         }]
                     },
                     options: {
                         scales: {
                             y: {
-                                beginAtZero: true,
-                                stacked: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            },
-                            x: {
-                                stacked: true
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
                             }
                         }
                     }
                 });
+
                 // current workload per employee
                 /* TODO: Test later?
                 const LabelNames = {
@@ -489,16 +519,6 @@ export default {
     }
 };
 
-async function processesHistory() {
-    const response = await fetch("http://localhost:8080/processes");
-    return await response.json();
-}
-
-async function testHistory() {
-    const response = await fetch("http://localhost:8080/test");
-    return await response.json();
-}
-
 async function getProjects() {
     const response = await fetch("http://localhost:8080/projects");
     return await response.json();
@@ -590,10 +610,10 @@ async function getEmployeeName(employeeId) {
     return 'no name found'
 }
 
-async function getActivitieName(activitieId)  {
+async function getActivityName(activityId)  {
     let activities = await (await fetch("http://localhost:8080/activities/running")).json();
     for (const activity of activities) {
-        if (activity.id === activitieId) {
+        if (activity.id === activityId) {
             return activity.activityName
         }
     }

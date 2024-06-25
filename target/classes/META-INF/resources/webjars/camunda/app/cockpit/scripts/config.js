@@ -26,7 +26,8 @@ export default {
   //   // with a file called 'customScript.js' in it
   //   // 'my-custom-script/customScript'
       'scripts/startInstances.js',
-      'scripts/contextTest.js'
+      'scripts/contextTest.js',
+      'scripts/deleteProcess.js',
   ],
   // requireJsConfig: {
   //   // AngularJS module names

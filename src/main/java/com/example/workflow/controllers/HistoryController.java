@@ -81,28 +81,9 @@ public class HistoryController {
         return y;
     }
     @GetMapping("/projects")
-    public JSONArray getProjects() {
-        JSONObject unused = new JSONObject();
-        unused.put("id", "0");
-        unused.put("hours", "300");
-        unused.put("name", "unused hours");
-        JSONObject project1 = new JSONObject();
-        project1.put("id", "1");
-        project1.put("hours", "100");
-        project1.put("name", "Project 1");
-        JSONObject project2 = new JSONObject();
-        project2.put("id", "2");
-        project2.put("hours", "120");
-        project2.put("name", "Project 2");
-        JSONObject project3 = new JSONObject();
-        project3.put("id", "3");
-        project3.put("hours", "80");
-        project3.put("name", "Project 3");
-        JSONArray projects = new JSONArray();
-        projects.add(unused);
-        projects.add(project1);
-        projects.add(project2);
-        projects.add(project3);
+    public JSONArray getProjects() throws FileNotFoundException, ParseException {
+        JSONParser parser = new JSONParser();
+        JSONArray projects = (JSONArray) parser.parse(new FileReader("src/main/resources/data/projects.json"));
         return projects;
     }
     @GetMapping("/employees")

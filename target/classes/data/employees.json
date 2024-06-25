@@ -5,9 +5,9 @@
     "weekly_hours": 20
   },
   {
-    "id": "daisydoe",
-    "name": "Daisy Doe",
-    "weekly_hours": 38
+    "id": "williamcrane",
+    "name": "William Crane",
+    "weekly_hours": 30
   },
   {
     "id": "jamessmith",
@@ -15,8 +15,8 @@
     "weekly_hours": 40
   },
   {
-    "id": "williamcrane",
-    "name": "William Crane",
-    "weekly_hours": 30
+    "id": "daisydoe",
+    "name": "Daisy Doe",
+    "weekly_hours": 38
   }
 ]
