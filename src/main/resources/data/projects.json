@@ -1,22 +1,22 @@
 [
   {
     "id": "0",
-    "hours": 300,
+    "hours": 18,
     "name": "unused hours"
   },
   {
     "id": "1",
-    "hours": 100,
+    "hours": 70,
     "name": "Order Process"
   },
   {
     "id": "2",
-    "hours": 120,
+    "hours": 25,
     "name": "BPMN Project"
   },
   {
     "id": "3",
-    "hours": 80,
+    "hours": 15,
     "name": "Project Alpha"
   }
 ]

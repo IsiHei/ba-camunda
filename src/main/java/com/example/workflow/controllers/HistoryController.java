@@ -46,7 +46,7 @@ public class HistoryController {
         List<List<HistoricDetail>> process_variables = new ArrayList<>();
         List<HistoricProcessInstance> processes = historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceStartTime().asc().list();
         for (HistoricProcessInstance process : processes) {
-            List<HistoricDetail> details = historyService.createHistoricDetailQuery().processInstanceId(process.getId()).orderByVariableName().asc().list();
+            List<HistoricDetail> details = historyService.createHistoricDetailQuery().processInstanceId(process.getId()).orderByTime().asc().list();
             process_variables.add(details);
         }
         return process_variables;

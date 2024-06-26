@@ -71,7 +71,7 @@ export default {
                                 <tr><td style="padding-bottom: 15px;">Employee</td><td style="padding-bottom: 15px;">`+ employeeName +`</td></tr>
                                 <tr><td>Start Date</td><td>`+ startTime.toDateString() +`</td></tr>
                                 <tr><td style="border-bottom: 4px double gray;">End Date</td><td style="border-bottom: 4px double gray;">`+ endTime.toDateString() +`</td></tr>
-                                <tr><td>→ Requested Days</td><td>`+ (startTime-endTime) +`</td></tr>
+                                <tr><td>→ Requested Days</td><td>`+ ((endTime-startTime)/86400000) +`</td></tr>
                             </table>
                         </div>
                     </div>
@@ -217,7 +217,7 @@ export default {
                             <tr><td style="padding-bottom: 15px;">Employee</td><td style="padding-bottom: 15px;">`+ employeeName +`</td></tr>
                             <tr><td>Start Date</td><td>`+ startTime.toDateString() +`</td></tr>
                             <tr><td style="border-bottom: 4px double gray;">End Date</td><td style="border-bottom: 4px double gray;">`+ endTime.toDateString() +`</td></tr>
-                            <tr><td>→ Requested Days</td><td>`+ (startTime-endTime) +`</td></tr>
+                            <tr><td>→ Requested Days</td><td>`+ ((endTime-startTime)/86400000) +`</td></tr>
                         </table>
                     </div>
                 </div>
@@ -247,6 +247,8 @@ export default {
             let labels = [];
             let annotations = {};
             const workload = await getUserWorkload();
+            console.log(workload);
+            console.log(getProcessVariables('db6a0db9-32d8-11ef-9066-1ef3fdbca0ce'));
             let n = 0;
             for (const a in workload) {
                 let assignee = workload[a];
@@ -556,6 +558,7 @@ async function getApplicationStatistics() {
 }
 
 async function getProcessVariables(processInstanceId) {
+    //TODO: multiple workload_in_hours (how to take newest)
     let variables = {};
     const variables_response = await (await fetch("http://localhost:8080/processes/details")).json();
     for (const variables_raw of variables_response) {
