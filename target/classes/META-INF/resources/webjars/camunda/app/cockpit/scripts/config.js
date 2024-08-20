@@ -26,7 +26,7 @@ export default {
   //   // with a file called 'customScript.js' in it
   //   // 'my-custom-script/customScript'
       'scripts/startInstances.js',
-      'scripts/contextTest.js',
+      'scripts/context.js',
       'scripts/deleteProcess.js',
   ],
   // requireJsConfig: {

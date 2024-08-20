@@ -4,20 +4,16 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.model.bpmn.instance.Property;
-import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import spinjar.com.minidev.json.JSONArray;
-import spinjar.com.minidev.json.JSONObject;
 import spinjar.com.minidev.json.parser.JSONParser;
 import spinjar.com.minidev.json.parser.ParseException;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -25,7 +21,6 @@ public class HistoryController {
 
     @Autowired
     private HistoryService historyService;
-    private ServiceTask serviceTask;
 
     @GetMapping("/completed-processes")
     public List<HistoricProcessInstance> getCompletedProcesses() {
@@ -51,6 +46,16 @@ public class HistoryController {
         }
         return process_variables;
     }
+    @GetMapping("/running/activities/details")
+    public List<List<HistoricDetail>> getActivityDetails() {
+        List<List<HistoricDetail>> activity_variables = new ArrayList<>();
+        List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery().unfinished().orderByHistoricActivityInstanceStartTime().asc().list();
+        for (HistoricActivityInstance activity : activities) {
+            List<HistoricDetail> details = historyService.createHistoricDetailQuery().activityInstanceId(activity.getId()).orderByTime().asc().list();
+            activity_variables.add(details);
+        }
+        return activity_variables;
+    }
     @GetMapping("/processes")
     public List<HistoricProcessInstance> getProcessInstances() {
         return historyService.createHistoricProcessInstanceQuery().list();
@@ -59,9 +64,9 @@ public class HistoryController {
     public List<HistoricActivityInstance> getActivityInstances() {
         return historyService.createHistoricActivityInstanceQuery().list();
     }
-    @GetMapping("/activities/running")
+    @GetMapping("/running/activities")
     public List<HistoricActivityInstance> getRunningActivityInstances() {
-        return historyService.createHistoricActivityInstanceQuery().unfinished().list();
+        return historyService.createHistoricActivityInstanceQuery().unfinished().orderByHistoricActivityInstanceStartTime().asc().list();
     }
 
     @GetMapping("/tasks")
@@ -72,6 +77,7 @@ public class HistoryController {
     public List<HistoricTaskInstance> getRunningTaskInstances() {
         return historyService.createHistoricTaskInstanceQuery().unfinished().list();
     }
+    /*
     @GetMapping("/test")
     public List<String> getTest() {
         List<HistoricProcessInstance> x;
@@ -80,6 +86,7 @@ public class HistoryController {
         x.forEach(c -> y.add(c.getId()));
         return y;
     }
+    */
     @GetMapping("/projects")
     public JSONArray getProjects() throws FileNotFoundException, ParseException {
         JSONParser parser = new JSONParser();
