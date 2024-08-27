@@ -2,7 +2,7 @@ This project was developed in a thesis to show how context visualization can be 
 
 used software:
   
--  Camunda Application 7 (Apache 2.0 Lizenz): https://camunda.com/de/download/platform-7/ 
+-  Camunda 7 Community (Apache 2.0 Lizenz): https://camunda.com/de/download/platform-7/ 
 -  Chart.js (MIT licence): https://www.chartjs.org/docs/latest/getting-started/integration.html
 
 used processes:
