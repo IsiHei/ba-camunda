@@ -1,3 +1,5 @@
+This project was developed in a thesis to show how context visualization can be placed in Camunda 7.
+
 used software:
   
 -  Camunda Application 7 (Apache 2.0 Lizenz): https://camunda.com/de/download/platform-7/ 
