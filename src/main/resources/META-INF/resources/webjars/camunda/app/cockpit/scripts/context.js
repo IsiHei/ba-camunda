@@ -81,7 +81,7 @@ export default {
             script.src = "https://cdn.jsdelivr.net/npm/chart.js";
             script.onload = () => {
                 // #accepted vs #rejected applications
-                const pr = document.getElementById('pastRequestsChart').getContext('2d');
+                const pr = document.getElementById('pastRequestsChart');
                 const historyBar = new Chart(pr, {
                     type: 'bar',
                     data: {
@@ -125,7 +125,7 @@ export default {
                     }
                 });
                 //Ongoing Projects
-                const pd = document.getElementById('projectsDoughnut').getContext('2d');
+                const pd = document.getElementById('projectsDoughnut');
                 const projectsDoughnut = new Chart(pd, {
                     type: 'doughnut',
                     data: {
@@ -161,14 +161,13 @@ export default {
                         }]
                     },
                     options: {
-                        responsive: true,
                         plugins: {
                             legend: {
-                                position: 'top'
+                                position: 'top' // top is default value
                             },
                             title: {
                                 display: false,
-                                text: 'workload'
+                                //text: 'workload'
                             }
                         }
                     }
@@ -247,22 +246,19 @@ export default {
             let labels = [];
             let annotations = {};
             const workload = await getUserWorkload();
-            console.log(workload);
-            console.log(getProcessVariables('db6a0db9-32d8-11ef-9066-1ef3fdbca0ce'));
             let n = 0;
             for (const a in workload) {
                 let assignee = workload[a];
                 let assigneeName = '';
                 if (a === 'null') {
                     assigneeName = 'not assigned'
-                    labels.push('not assigned');
                 }
-                 else {
+                else {
                      assigneeName = await getEmployeeName(a);
-                     labels.push(assigneeName);
                 }
-                 let yAnnotation = 0;
-                 let m = 0;
+                labels.push(assigneeName);
+                let yAnnotation = 0;
+                let m = 0;
                 for (const activity in assignee) {
                     let activityWorkload = assignee[activity];
                     let data = new Array(workload.length);
@@ -274,12 +270,8 @@ export default {
                     let dataset = {
                         data: data,
                         label: activity,
-                        backgroundColor: [
-                            ('rgba('+r+','+g+','+b+',0.2)')
-                        ],
-                        borderColor: [
-                            ('rgba('+r+','+g+','+b+',0.9)')
-                        ],
+                        backgroundColor: [('rgba('+r+','+g+','+b+',0.2)')],
+                        borderColor: [('rgba('+r+','+g+','+b+',0.9)')],
                         borderWidth: 1
                     }
                     annotations[('label'+n+'_'+m)] = {
@@ -299,7 +291,7 @@ export default {
             //Load Script for Group Leader context charts
             script.onload = () => {
                 // weekly hours for every employee
-                const whc = document.getElementById('weeklyHoursChart').getContext('2d');
+                const whc = document.getElementById('weeklyHoursChart');
                 const whChart = new Chart(whc, {
                     type: 'bar',
                     data: {
@@ -343,16 +335,7 @@ export default {
                 });
 
                 // current workload per employee
-                /* TODO: Test later?
-                const LabelNames = {
-                    id: 'LabelNames',
-                    afterDatasetsDraw(chart, args, pluginOptions) {
-                        const { ctx } = chart;
-
-                    }
-                }*/
-                //TODO check if getContext('2d') is needed and why
-                const cw = document.getElementById('currentWorkloadChart').getContext('2d');
+                const cw = document.getElementById('currentWorkloadChart');
                 const workloadBar = new Chart(cw, {
                     type: 'bar',
                     data: {
@@ -373,15 +356,15 @@ export default {
                                     drawBorder: false,
                                     color: function(context) {
                                         if (context.tick.value === 20 || context.tick.value === 30 || context.tick.value === 40) {
-                                            return 'rgba(0, 0, 0, 0.2)'; // Farbe der dickeren Linie
+                                            return 'rgba(0, 0, 0, 0.2)'; // color of chosen grid lines
                                         }
-                                        return 'rgba(0, 0, 0, 0.1)'; // Standardfarbe der Linie
+                                        return 'rgba(0, 0, 0, 0.1)'; // default grid color
                                     },
                                     lineWidth: function(context) {
                                         if (context.tick.value === 20 || context.tick.value === 30 || context.tick.value === 40) {
-                                            return 2; // Dickere Linie
+                                            return 2; // thickness of chosen grid lines
                                         }
-                                        return 1; // Standarddicke der Linie
+                                        return 1; // default grid thickness
                                     }
                                 }
                             },
@@ -437,7 +420,7 @@ export default {
             const script = document.createElement('script');
             script.src = "https://cdn.jsdelivr.net/npm/chart.js";
             script.onload = () => {
-                const ctx = document.getElementById('myChart').getContext('2d');
+                const ctx = document.getElementById('myChart');
                 const myChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -472,7 +455,7 @@ export default {
                         }
                     }
                 });
-                const ctx2 = document.getElementById('myChart2').getContext('2d');
+                const ctx2 = document.getElementById('myChart2');
                 const myChart2 = new Chart(ctx2, {
                     type: 'line',
                     data: {
@@ -573,7 +556,8 @@ async function getProcessVariables(processInstanceId) {
     return variables;
 }
 
-async function getActivityVariables(activityInstanceId) {
+// {var1: val1, ..., varN: valN} for given activityInstanceId
+async function getRunningActivityVariables(activityInstanceId) {
     let variables = {};
     const variables_response = await (await fetch("http://localhost:8080/running/activities/details")).json();
     for (const variables_raw of variables_response) {
@@ -604,13 +588,12 @@ async function getCurrentActivity(api, processInstanceId) {
     return {"id": activityId, "name": activityName}
 }
 
-//  { user_1: {activityID_1: working hours_1, ..., activityID_n: working hours_n}, ... }
+//  {employeeID_1: {activityID_1: working hours_1, ..., activityID_n: working hours_n}, ... }
 async function getUserWorkload()  {
     const activities = await (await fetch("http://localhost:8080/running/activities")).json();
     let user_activities = {}
     for (const activity of activities) {
-        const variables = await getActivityVariables(activity.id);
-        console.log(variables);
+        const variables = await getRunningActivityVariables(activity.id);
         if (activity.processDefinitionKey === 'order') {
             if (!user_activities.hasOwnProperty(activity.assignee)) {user_activities[activity.assignee] = {}}
             user_activities[activity.assignee][activity.id] = variables['workload_in_hours'];
